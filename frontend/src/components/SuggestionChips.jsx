@@ -1,0 +1,51 @@
+import { useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
+
+export default function SuggestionChips({ chips, accentColor, onSelect }) {
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    gsap.fromTo(containerRef.current.children,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: 'power2.out' }
+    )
+  }, [chips])
+
+  return (
+    <div ref={containerRef} style={styles.wrapper}>
+      {chips.map((chip, i) => (
+        <button
+          key={i}
+          onClick={() => onSelect(chip)}
+          style={{ ...styles.chip, borderColor: accentColor + '44', color: accentColor }}
+          onMouseEnter={e => e.currentTarget.style.background = accentColor + '18'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
+          {chip}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+const styles = {
+  wrapper: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+    justifyContent: 'center',
+    padding: '0 24px 16px',
+  },
+  chip: {
+    background: 'transparent',
+    border: '1px solid',
+    borderRadius: '20px',
+    padding: '8px 16px',
+    fontSize: '13px',
+    cursor: 'pointer',
+    transition: 'background 0.2s',
+    textAlign: 'left',
+    lineHeight: '1.4',
+    maxWidth: '260px',
+  },
+}

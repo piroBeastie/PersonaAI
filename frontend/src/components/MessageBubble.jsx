@@ -13,35 +13,34 @@ export default function MessageBubble({ message, accentColor }) {
   }, [])
 
   return (
-    <div ref={ref} style={{ ...styles.row, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+    <div ref={ref} style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', width: '100%', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
       {!isUser && (
-        <div style={{ ...styles.avatar, background: accentColor }}>
-          AI
-        </div>
+        <div style={{ ...styles.avatar, background: accentColor }}>AI</div>
       )}
-      <div style={{
-        ...styles.bubble,
-        background: isUser ? '#1e3a5f' : '#1a1a1a',
-        borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-        borderColor: isUser ? '#2a4f7f' : '#2a2a2a',
-        maxWidth: isUser ? '70%' : '80%',
-      }}>
-        <p style={styles.text}>{message.content}</p>
+      <div
+        className={isUser ? 'bubble-user' : 'bubble-model'}
+        style={{
+          padding: '11px 15px',
+          border: '1px solid',
+          lineHeight: '1.6',
+          fontSize: '14px',
+          color: '#e8eaed',
+          whiteSpace: 'pre-wrap',
+          background: isUser ? '#1e3a5f' : '#1a1a1a',
+          borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+          borderColor: isUser ? '#2a4f7f' : '#2a2a2a',
+        }}
+      >
+        {message.content}
       </div>
     </div>
   )
 }
 
 const styles = {
-  row: {
-    display: 'flex',
-    alignItems: 'flex-end',
-    gap: '10px',
-    width: '100%',
-  },
   avatar: {
-    width: '28px',
-    height: '28px',
+    width: '26px',
+    height: '26px',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -50,15 +49,5 @@ const styles = {
     fontWeight: '700',
     color: '#0d0d0d',
     flexShrink: 0,
-  },
-  bubble: {
-    padding: '12px 16px',
-    border: '1px solid',
-    lineHeight: '1.6',
-  },
-  text: {
-    fontSize: '14px',
-    color: '#e8eaed',
-    whiteSpace: 'pre-wrap',
   },
 }

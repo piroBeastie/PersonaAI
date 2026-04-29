@@ -9,7 +9,6 @@ export default function ChatInput({ onSend, isLoading, accentColor }) {
     if (!trimmed || isLoading) return
     onSend(trimmed)
     setValue('')
-    // Reset height after clearing
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
   }
 
@@ -27,8 +26,20 @@ export default function ChatInput({ onSend, isLoading, accentColor }) {
   }
 
   return (
-    <div style={styles.wrapper}>
-      <div style={{ ...styles.container, borderColor: value ? accentColor + '66' : '#2a2a2a' }}>
+    <div className="input-wrapper">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        background: '#1a1a1a',
+        border: '1px solid',
+        borderColor: value ? accentColor + '66' : '#2a2a2a',
+        borderRadius: '16px',
+        padding: '10px 10px 10px 16px',
+        transition: 'border-color 0.2s',
+        maxWidth: '760px',
+        margin: '0 auto',
+      }}>
         <textarea
           ref={textareaRef}
           value={value}
@@ -52,30 +63,12 @@ export default function ChatInput({ onSend, isLoading, accentColor }) {
           ↑
         </button>
       </div>
-      <p style={styles.hint}>Enter to send · Shift+Enter for new line</p>
+      <p className="input-hint">Enter to send · Shift+Enter for new line</p>
     </div>
   )
 }
 
 const styles = {
-  wrapper: {
-    padding: '12px 24px 20px',
-    flexShrink: 0,
-  },
-  container: {
-    display: 'flex',
-    // center keeps textarea and button vertically aligned when textarea is 1 line
-    alignItems: 'center',
-    gap: '10px',
-    background: '#1a1a1a',
-    border: '1px solid',
-    borderRadius: '16px',
-    // equal top+bottom padding so single-line text sits dead center
-    padding: '10px 10px 10px 16px',
-    transition: 'border-color 0.2s',
-    maxWidth: '760px',
-    margin: '0 auto',
-  },
   textarea: {
     flex: 1,
     background: 'none',
@@ -83,13 +76,11 @@ const styles = {
     outline: 'none',
     color: '#e8eaed',
     fontSize: '14px',
-    // No extra line-height that inflates single-line height
     lineHeight: '22px',
     resize: 'none',
     fontFamily: 'inherit',
     maxHeight: '160px',
     overflowY: 'auto',
-    // Remove browser default textarea padding that causes top-heavy feel
     padding: '0',
     display: 'block',
   },
@@ -106,11 +97,5 @@ const styles = {
     transition: 'background 0.2s, color 0.2s',
     flexShrink: 0,
     lineHeight: 1,
-  },
-  hint: {
-    textAlign: 'center',
-    color: '#555',
-    fontSize: '11px',
-    marginTop: '8px',
   },
 }

@@ -81,7 +81,7 @@ const styles = {
     background: '#0d0d0d',
   },
   logo: {
-    fontSize: '52px',
+    fontSize: 'clamp(36px, 10vw, 52px)',
     fontWeight: '600',
     letterSpacing: '-1px',
     lineHeight: 1,

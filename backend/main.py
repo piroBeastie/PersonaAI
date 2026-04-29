@@ -2,29 +2,36 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from personas import PERSONAS
 
 load_dotenv()
 
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
-app = FastAPI()
+# Rate limiter — keyed by the requester's IP address
+limiter = Limiter(key_func=get_remote_address)
 
-# Allow React dev server to call this API
+app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Same-origin on Vercel (no CORS needed), but kept for local dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Request / response shapes — FastAPI validates these automatically
 class Message(BaseModel):
-    role: str     # "user" or "model"
+    role: str
     content: str
 
 class ChatRequest(BaseModel):
@@ -53,16 +60,16 @@ def get_personas():
 
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
-    if request.persona_id not in PERSONAS:
-        raise HTTPException(status_code=400, detail=f"Unknown persona: {request.persona_id}")
+@limiter.limit("15/minute")  # max 15 messages per minute per IP
+async def chat(request: Request, body: ChatRequest):
+    if body.persona_id not in PERSONAS:
+        raise HTTPException(status_code=400, detail=f"Unknown persona: {body.persona_id}")
 
-    persona = PERSONAS[request.persona_id]
+    persona = PERSONAS[body.persona_id]
 
-    # Convert message history to Gemini's format
     history = [
         types.Content(role=msg.role, parts=[types.Part(text=msg.content)])
-        for msg in request.messages
+        for msg in body.messages
     ]
 
     try:

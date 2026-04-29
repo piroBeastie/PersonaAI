@@ -12,19 +12,19 @@ export default function ChatWindow({ messages, isTyping, chips, accentColor, onC
   }, [messages, isTyping])
 
   return (
-    <div style={styles.window}>
+    <div className="chat-window-scroll">
       {isEmpty ? (
         <div style={styles.emptyState}>
           <p style={styles.emptyText}>Ask me anything</p>
           <SuggestionChips chips={chips} accentColor={accentColor} onSelect={onChipSelect} />
         </div>
       ) : (
-        <div style={styles.messages}>
+        <div className="messages-list">
           {messages.map((msg, i) => (
             <MessageBubble key={i} message={msg} accentColor={accentColor} />
           ))}
           {isTyping && (
-            <div style={styles.typingRow}>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <TypingIndicator accentColor={accentColor} />
             </div>
           )}
@@ -36,13 +36,6 @@ export default function ChatWindow({ messages, isTyping, chips, accentColor, onC
 }
 
 const styles = {
-  window: {
-    flex: 1,
-    overflowY: 'auto',
-    padding: '24px',
-    display: 'flex',
-    flexDirection: 'column',
-  },
   emptyState: {
     flex: 1,
     display: 'flex',
@@ -51,20 +44,5 @@ const styles = {
     justifyContent: 'center',
     gap: '20px',
   },
-  emptyText: {
-    color: '#9aa0a6',
-    fontSize: '15px',
-  },
-  messages: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    width: '100%',
-    maxWidth: '760px',
-    margin: '0 auto',
-  },
-  typingRow: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
+  emptyText: { color: '#9aa0a6', fontSize: '15px' },
 }

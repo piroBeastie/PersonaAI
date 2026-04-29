@@ -4,7 +4,7 @@ import PersonaSwitcher from '../components/PersonaSwitcher'
 import ChatWindow from '../components/ChatWindow'
 import ChatInput from '../components/ChatInput'
 
-const API = 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const ACCENT_COLORS = {
   anshuman: '#a8c7fa',
@@ -62,6 +62,7 @@ export default function ChatPage() {
       })
       if (!res.ok) {
         const err = await res.json()
+        if (res.status === 429) throw new Error('Too many messages. Wait a moment before sending again.')
         throw new Error(err.detail || 'Something went wrong')
       }
       const data = await res.json()
@@ -78,23 +79,20 @@ export default function ChatPage() {
 
   return (
     <div ref={pageRef} style={styles.page}>
-      {/* Header */}
-      <div style={styles.header}>
+      <div className="header">
         <span style={styles.logo}>
-          {/* Light grey "Persona", white thin "AI" — no gradient on the nav logo */}
           <span style={styles.logoScaler}>Persona</span>
           <span style={styles.logoAI}> AI</span>
         </span>
         {currentPersona && (
-          <span style={{ ...styles.activeLabel, color: accentColor }}>
+          <span style={{ fontSize: '13px', fontWeight: '500', color: accentColor }}>
             {currentPersona.name}
           </span>
         )}
       </div>
 
-      {/* Tabs — centered, 60vw total, 20vw each */}
       {Object.keys(personas).length > 0 && (
-        <div style={styles.tabsOuter}>
+        <div className="tabs-outer">
           <PersonaSwitcher
             personas={personas}
             active={activePersona}
@@ -105,7 +103,7 @@ export default function ChatPage() {
 
       {error && <div style={styles.error}>{error}</div>}
 
-      <div className="chat-window" style={styles.chatWrapper}>
+      <div className="chat-window" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <ChatWindow
           messages={messages}
           isTyping={isTyping}
@@ -122,59 +120,26 @@ export default function ChatPage() {
 
 const styles = {
   page: {
-    height: '100vh',
+    height: '100dvh',
     display: 'flex',
     flexDirection: 'column',
     background: '#0d0d0d',
   },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '16px 24px 12px',
-    borderBottom: '1px solid #2a2a2a',
-    flexShrink: 0,
-  },
   logo: {
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: '2px',
     fontSize: '20px',
     fontWeight: '600',
     letterSpacing: '-0.5px',
-  },
-  logoScaler: {
-    color: '#9aa0a6',
-    fontWeight: '600',
-  },
-  logoAI: {
-    color: '#ffffff',
-    fontWeight: '300',
-    fontSize: '18px',
-  },
-  activeLabel: {
-    fontSize: '13px',
-    fontWeight: '500',
-  },
-  // Outer wrapper centers the tab strip and limits its width to 60vw
-  tabsOuter: {
     display: 'flex',
-    justifyContent: 'flex-start',
-    borderBottom: '1px solid #2a2a2a',
-    flexShrink: 0,
-    paddingLeft: '24px',
+    alignItems: 'baseline',
+    gap: '2px',
   },
-  chatWrapper: {
-    flex: 1,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  },
+  logoScaler: { color: '#9aa0a6', fontWeight: '600' },
+  logoAI: { color: '#ffffff', fontWeight: '300', fontSize: '18px' },
   error: {
     background: '#2d1515',
     border: '1px solid #5c2626',
     color: '#f87171',
-    padding: '10px 24px',
+    padding: '10px 16px',
     fontSize: '13px',
     flexShrink: 0,
   },
